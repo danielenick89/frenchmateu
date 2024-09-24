@@ -57,7 +57,7 @@ class World extends THREE.Group {
                 police.position.z = i * length / 10 - length / 2 + length / 20;
                 this.polices.push(police);
                 this.add(police);
-                CollisionDetector.add(police,0.5);
+                CollisionDetector.add(police,0.9);
             }
         }
 

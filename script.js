@@ -115,12 +115,12 @@ const stop = function (dt, reason) {
     }
 
     if (reason === 'crashed' && rate < 1) {
-        car.rotation.z = (1-rate) * Math.PI * 8;
-        car.rotation.y = -(1-rate) * Math.PI * 8;
+        car.rotation.z = -directionToStop*(1-rate) * Math.PI * 8;
+        //car.rotation.y = -directionToStop*(1-rate) * Math.PI * 8;
     }
 
     car.drive(directionToStop, dt);
-    car.stop(rate, directionToStop);
+    car.stop(rate, directionToStop, reason == "crashed");
     world.setRatio(ratioToStop * (1 - rate));
     controls.target.copy(car.position);
     controls.autoRotate = true;

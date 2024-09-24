@@ -124,9 +124,10 @@ class Car extends THREE.Group {
         }
     }
 
-    stop(rate,dir) {
+    stop(rate,dir,crashed) {
         if(rate>1) rate=1;
-        this.rotation.y = -dir*Math.PI/3*(Math.pow(rate,1/3));
+        
+        this.rotation.y = -dir*Math.PI/(crashed?2:3)*(Math.pow(rate,1/3));
     }
 }
 
