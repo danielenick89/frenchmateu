@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { CollisionDetector } from './CollisionDetector.js';
 
 
 
@@ -57,6 +58,7 @@ class Street extends THREE.Group {
             post.position.set(side*3.5,0,length/2-i*POLE_DISTANCE);
             this.add(post);
             this.posts.push(post);
+            CollisionDetector.add(post,0.5);
         }
 
         const l1 = new THREE.Mesh(new THREE.BoxGeometry(0.1,0.2,length),clm);

@@ -3,6 +3,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { InfiniteExtendingWorld } from './World.js'
 import { Car } from './Car.js';
 import { updateDistance, updateBattery, showBusted, toggleLightClass, hideWelcomeScreen } from './UI.js';
+import { CollisionDetector } from './CollisionDetector.js';
 
 const scene = new THREE.Scene();
 scene.fog = new THREE.Fog(0, 10, 100);
@@ -33,8 +34,10 @@ const BATTERY_RATIO = 0.004;
 let battery = 100;
 let lost = false;
 
+let end = null;
+
 function animate(time) {
-    if(startTime === null) {
+    if (startTime === null) {
         startTime = time;
         lastTime = startTime;
         return;
@@ -54,12 +57,16 @@ function animate(time) {
     } else {
         world.setLight(true);
     }
+
     world.setRatio(Math.sqrt(time / 10000000))
-    //world.setRatio(0)
     renderer.render(scene, camera);
 
-    if (lost || battery <= 0) {
-        stop(dt, battery <= 0);
+    const crashed = CollisionDetector.check(car);
+
+    end = end || (lost ? 'police' : (battery <= 0 ? 'battery' : (crashed ? 'crashed' : null)));
+
+    if (end) {
+        stop(dt, end);
     } else {
 
         if (currentDir) {
@@ -81,18 +88,37 @@ function animate(time) {
 
 }
 
-const stop = function (dt, lowBattery) {
-    showBusted(lowBattery ? "LOW BATTERY" : "ARRESTED");
+const stop = function (dt, reason) {
+    switch (reason) {
+        case 'police':
+            showBusted("ARRESTED");
+            break;
+        case 'battery':
+            showBusted("LOW BATTERY");
+            break;
+        case 'crashed':
+            showBusted("CRASHED");
+            break;
+    }
+
     if (!ratioToStop) {
         ratioToStop = world.getRatio();
         directionToStop = car.position.x > 0 ? 1 : -1;
     }
+
+
     stopStep += dt;
     const rate = stopStep / STOP_ANIMATION_LENGTH;
     if (rate < 1) {
         camera.position.y = rate * 20
         camera.position.z = rate * 50;
     }
+
+    if (reason === 'crashed' && rate < 1) {
+        car.rotation.z = (1-rate) * Math.PI * 8;
+        car.rotation.y = -(1-rate) * Math.PI * 8;
+    }
+
     car.drive(directionToStop, dt);
     car.stop(rate, directionToStop);
     world.setRatio(ratioToStop * (1 - rate));

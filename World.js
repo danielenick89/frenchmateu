@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { getRandom } from './Random.js'
 import { Street } from './Street.js';
 import { Police } from './Police.js';
+import { CollisionDetector } from './CollisionDetector.js';
 
 
 class Bush extends THREE.Group {
@@ -36,9 +37,11 @@ class World extends THREE.Group {
             let x = random() * (length / 2 - 4) + 4;
             let y = random() * length - length / 2;
             let dir = random() - 0.5 > 0 ? 1 : -1;
-            const b = new Bush(1 + random() * 3);
+            const size = 1 + random() * 3;
+            const b = new Bush(size);
             b.position.set(dir * x, 0, y);
             this.add(b);
+            CollisionDetector.add(b,size/2);
         }
 
         for (let i = 0; i < length / 10; i++) {
@@ -54,6 +57,7 @@ class World extends THREE.Group {
                 police.position.z = i * length / 10 - length / 2 + length / 20;
                 this.polices.push(police);
                 this.add(police);
+                CollisionDetector.add(police,0.5);
             }
         }
 
@@ -98,6 +102,7 @@ class InfiniteExtendingWorld extends THREE.Group {
         this.SUBLENGTH = this.WORLD_LENGTH;
 
         this.world = new World(this.WORLD_LENGTH, policeProbability,seed);
+        CollisionDetector.setWorld(this.world);
         this.nextWorld = new World(this.WORLD_LENGTH, policeProbability,seed);
         this.nextWorld.position.z = -this.WORLD_LENGTH;
 
