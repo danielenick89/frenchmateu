@@ -45,7 +45,7 @@ class World extends THREE.Group {
         }
 
         for (let i = 0; i < length / 10; i++) {
-            if (random() < policeProbability) {
+            if (random() < policeProbability || i+1>=length/10 && this.polices.length == 0 ) {
                 const police = new Police();
                 if (random() < 0.5) {
                     police.rotation.y = Math.PI / 2 * 0.8;
