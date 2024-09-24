@@ -21,9 +21,12 @@ class World extends THREE.Group {
         super()
 
         const TREE_COUNT = 100;
+        this.POLICE_RANGE = 1;
 
         const random = getRandom(seed);
         const street = new Street(length);
+
+        this.polices = [];
 
         const terrain = new THREE.Mesh(new THREE.PlaneGeometry(length, length), new THREE.MeshStandardMaterial({ color: 0x3dba6b }));
         terrain.rotation.x = -Math.PI / 2;
@@ -40,6 +43,7 @@ class World extends THREE.Group {
         for (let i = 0; i < length / 10; i++) {
             if (random() < policeProbability) {
                 const police = new Police();
+                police.siren(true)
                 if (random() < 0.5) {
                     police.rotation.y = Math.PI / 2;
                     police.position.x = +0.5;
@@ -48,6 +52,7 @@ class World extends THREE.Group {
                     police.position.x = -0.5;
                 }
                 police.position.z = i * length / 10 - length / 2 + length / 20;
+                this.polices.push(police);
                 this.add(police);
             }
         }
@@ -63,6 +68,20 @@ class World extends THREE.Group {
     setLight(on) {
         this.street.setLight(on);
     }
+
+    isPoliceWatching(car) {
+        const vertex = new THREE.Vector3(); // create once and reuse
+        for(let i=0; i<this.polices.length; i++) {
+
+            vertex.copy(this.polices[i].position);
+
+            this.polices[i].localToWorld( vertex );
+            const dz = car.position.z - vertex.z;
+            if(dz < this.POLICE_RANGE && dz > 0) return true;
+        }
+
+        return false;
+    }
 }
 
 class InfiniteExtendingWorld extends THREE.Group {
@@ -72,7 +91,7 @@ class InfiniteExtendingWorld extends THREE.Group {
 
         const seed = Math.floor(Math.random()*100000);
 
-        this.RATIO = 0.005;
+        this.RATIO = 0.01;
         this.WORLD_LENGTH = 100;
         this.SUBLENGTH = this.WORLD_LENGTH;
 
@@ -88,26 +107,36 @@ class InfiniteExtendingWorld extends THREE.Group {
     }
 
     move(dt) {
-        this.world.position.z += dt * this.RATIO;
-        this.nextWorld.position.z += dt * this.RATIO;
+        const ds = dt * this.RATIO
+        this.world.position.z += ds;
+        this.nextWorld.position.z += ds;
         if (this.world.position.z > this.SUBLENGTH) {
             this.world.position.z = 0;
             this.nextWorld.position.z = -this.WORLD_LENGTH;
         }
     }
 
+    isPoliceWatching(car) {
+        return this.world.isPoliceWatching(car);
+    }
+
     setLight(on) {
         if (on) {
             this.light.intensity = 0.45;
         } else {
-            this.light.intensity = 0.08;
+            this.light.intensity = 0.12;
         }
         this.world.setLight(on);
         this.nextWorld.setLight(on);
     }
 
     setRatio(ratio) {
+        if(ratio < 0) ratio = 0; 
         this.RATIO = ratio;
+    }
+
+    getRatio() {
+        return this.RATIO;
     }
 }
 

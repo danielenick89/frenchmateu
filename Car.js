@@ -8,6 +8,7 @@ class Car extends THREE.Group {
 
         this.DRIVE_RATE = 0.005;
         this.MAX_DRIVE = 5;
+        this.STOP_ANIMATION_LENGTH = 1000;
 
         const carColor = 0xcf4d44
 
@@ -91,6 +92,7 @@ class Car extends THREE.Group {
         this.add(s1);
         this.add(s2);
 
+        this.stopStep = 0;
     }
 
     drive(dir,dt) {
@@ -120,6 +122,11 @@ class Car extends THREE.Group {
             this.bf2.material.color.setHex(0x550000);
 
         }
+    }
+
+    stop(rate,dir) {
+        if(rate>1) rate=1;
+        this.rotation.y = -dir*Math.PI/3*(Math.pow(rate,1/3));
     }
 }
 

@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { InfiniteExtendingWorld } from './World.js'
 import { Car } from './Car.js';
-import { updateDistance, updateBattery } from './UI.js';
+import { updateDistance, updateBattery, showBusted, toggleLightClass } from './UI.js';
 
 const scene = new THREE.Scene();
 scene.fog = new THREE.Fog(0, 10, 100);
@@ -24,22 +24,25 @@ let blackoutTime = null;
 const BLACKOUT_TIME_SHORT = 100;
 const BLACKOUT_TIME_LONG = 8000;
 
+const STOP_ANIMATION_LENGTH = 2500;
+let stopStep = 0;
+let ratioToStop = null, directionToStop = null;
+
 const BATTERY_RATIO = 0.004;
 let battery = 100;
+let lost = false;
 
 function animate(time) {
     const dt = time - lastTime;
     lastTime = time;
     controls.update()
     world.move(dt);
+    car.lights(lights);
 
-    if (currentDir) {
-        car.drive(currentDir, dt);
-    } else {
-        car.drive(0, dt)
+    if (!lights && world.isPoliceWatching(car)) {
+        lost = true;
     }
 
-    car.lights(lights);
     if (time - blackoutStart < blackoutTime) {
         world.setLight(false);
     } else if (Math.random() < 0.003) {
@@ -48,14 +51,46 @@ function animate(time) {
     } else {
         world.setLight(true);
     }
-    world.setRatio(Math.sqrt(time/10000000))
-    //world.setRatio(0.01)
+    world.setRatio(Math.sqrt(time / 10000000))
+    //world.setRatio(0)
     renderer.render(scene, camera);
 
-    if (lights) battery -= BATTERY_RATIO * dt;
+    if (lost || battery <= 0) {
+        stop(dt, battery <= 0);
+    } else {
 
-    updateDistance(time / 100);
-    updateBattery(battery);
+        if (currentDir) {
+            car.drive(currentDir, dt);
+        } else {
+            car.drive(0, dt)
+        }
+
+
+        if (lights) battery -= BATTERY_RATIO * dt;
+
+        updateDistance(time / 100);
+        updateBattery(battery);
+    }
+
+}
+
+const stop = function (dt, lowBattery) {
+    showBusted(lowBattery ? "LOW BATTERY" : "ARRESTED");
+    if (!ratioToStop) {
+        ratioToStop = world.getRatio();
+        directionToStop = car.position.x > 0 ? 1 : -1;
+    }
+    stopStep += dt;
+    const rate = stopStep / STOP_ANIMATION_LENGTH;
+    if (rate < 1) {
+        camera.position.y = rate * 20
+        camera.position.z = rate * 50;
+    }
+    car.drive(directionToStop, dt);
+    car.stop(rate, directionToStop);
+    world.setRatio(ratioToStop * (1 - rate));
+    controls.target.copy(car.position);
+    controls.autoRotate = true;
 }
 
 function popuplate() {
@@ -78,8 +113,6 @@ let currentDir = null;
 const handleKeydown = (event) => {
     let dir = null;
 
-    console.log(event.which)
-
     switch (event.which) {
         case 39:
             dir = 1;
@@ -98,7 +131,6 @@ const handleKeydown = (event) => {
 }
 
 const handleKeyup = (event) => {
-    console.log(event.which)
     switch (event.which) {
         case 39:
             if (currentDir == 1)
@@ -111,7 +143,28 @@ const handleKeyup = (event) => {
     }
 }
 
+const handleTouchStart = (event) => {
+    switch (event.target.className.split(' ')[0]) {
+        case 'left': currentDir = -1;
+            break;
+        case 'center':
+            lights = !lights;
+            toggleLightClass();
+            break;
+        case 'right': currentDir = 1;
+            break;
+    }
+}
+
+const handleTouchEnd = (event) => {
+    if (event.touches.length == 0) {
+        currentDir = null;
+    }
+}
+
 document.body.addEventListener('keydown', handleKeydown);
 document.body.addEventListener('keyup', handleKeyup);
+document.getElementById('controls').addEventListener('touchstart', handleTouchStart);
+document.getElementById('controls').addEventListener('touchend', handleTouchEnd);
 
 init();

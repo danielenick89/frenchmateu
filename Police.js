@@ -83,6 +83,19 @@ class Car extends THREE.Group {
         this.add(s1);
         this.add(s2);
         this.position.y = 0.3;
+
+        const sirenL = getCube(0.3,0.1,0.1,0xff0000,false);
+        sirenL.position.set(-0.2,0.7,1.5);
+        const sirenConnector = getCube(0.1,0.25,0.1,0xffffff);
+        sirenConnector.position.set(0,0.625,1.5)
+        const sirenR = getCube(0.3,0.1,0.1,0x0000ff,false);
+        sirenR.position.set(0.2,0.7,1.5);
+
+        this.add(sirenL);
+        this.add(sirenR);
+        this.add(sirenConnector)
+        this.sirenL = sirenL;
+        this.sirenR = sirenR;
     }
 
     stop(dir,dt) {
@@ -101,6 +114,22 @@ class Car extends THREE.Group {
             this.bf1.material.color.setHex(0x550000);
             this.bf2.material.color.setHex(0x550000);
 
+        }
+    }
+
+    siren(on) {
+        clearInterval(this.interval);
+        if(on) {
+            setInterval(()=>{
+                this.sirenLeftRed = !this.sirenLeftRed;
+                if(this.sirenLeftRed) {
+                    this.sirenL.material.color.setHex(0xff00000)
+                    this.sirenR.material.color.setHex(0x00000ff)
+                } else {
+                    this.sirenR.material.color.setHex(0xff00000)
+                    this.sirenL.material.color.setHex(0x00000ff)
+                }
+            },200);
         }
     }
 }

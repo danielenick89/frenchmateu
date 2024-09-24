@@ -1,11 +1,13 @@
 <html>
 
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
     <style>
         body {
             margin: 0;
             overflow: hidden;
-            font-size: 4.0em;
+            font-size: 1.5em;
         }
 
         #distance {
@@ -23,12 +25,87 @@
             padding: 20px;
             color: white;
         }
+        #busted {
+            position:fixed;
+            display: none;
+            font-size: 2em;
+            padding-top: 30%;
+            width: 100%;
+            height: 100%;
+            color:white;
+            text-align:center;
+        }
+
+        #controls {
+            display: none;
+            position: fixed;
+
+            bottom:0;
+            width:100%;
+            height: 20%;
+            background-color: rgba(255,255,255,0.2);
+            z-index: 99;
+            opacity: 0.5;
+            user-select: none;
+        }
+
+        #controls div{
+            display:flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            vertical-align: middle;
+            width:33.3%;
+            height:100%;
+            font-size: 3em;
+            text-align: center;
+            color: white;
+            border-left: 1px solid  white;
+            border-right: 1px solid  white;
+        }
+
+        .left {
+            left: 0%;
+        }
+        .center{
+            left:33.3%;
+            mask-image: url(fari.png);
+            background-color: white;
+            mask-size: 20vw;
+            mask-position: center;
+            mask-repeat: no-repeat;
+        }
+
+        .center.on{
+            background-color: rgb(238, 200, 30);
+        }
+        .right{
+            left:66.6%;
+        }
+
+        @media only screen and (max-device-width:600px)  {
+            #controls {
+                display: block;
+            }
+        }
+
     </style>
 </head>
 
 <body>
     <div id="distance"></div>
     <div id="battery"></div>
+    <div id="busted">BUSTED</div>
+    <div id="controls">
+        <div class="left">
+            &lt;
+        </div>
+        <div class="center">
+        </div>
+        <div class="right">
+            &gt;
+        </div>
+    </div>
     <script type="importmap">
             {
               "imports": {
@@ -36,7 +113,7 @@
                 "three/addons/": "https://cdn.jsdelivr.net/npm/three/examples/jsm/"
               }
             }
-          </script>
+    </script>
     <script type="module" src="./script.js"></script>
 </body>
 
