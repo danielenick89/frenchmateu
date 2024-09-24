@@ -1,13 +1,20 @@
 <html>
 
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 
     <style>
         body {
             margin: 0;
             overflow: hidden;
-            font-size: 1.5em;
+            font-size: 3em;
+            user-select: none;
+            font-family: pricetown;
+        }
+
+        @font-face {
+            font-family: pricetown;
+            src: url("pricedown.otf") format("opentype");
         }
 
         #distance {
@@ -25,50 +32,57 @@
             padding: 20px;
             color: white;
         }
+
         #busted {
-            position:fixed;
+            position: fixed;
             display: none;
             font-size: 2em;
+            padding: 30px;
             padding-top: 30%;
-            width: 100%;
+            width: calc(100% - 60px);
             height: 100%;
-            color:white;
-            text-align:center;
+            color: white;
+            text-align: center;
+            user-select: none;
+            background-image: url(mateu.png);
+            background-size: cover;
+            background-position: center;
         }
 
         #controls {
             display: none;
             position: fixed;
 
-            bottom:0;
-            width:100%;
+            bottom: 0;
+            width: 100%;
             height: 20%;
-            background-color: rgba(255,255,255,0.2);
+            background-color: rgba(255, 255, 255, 0.2);
             z-index: 99;
             opacity: 0.5;
             user-select: none;
         }
 
-        #controls div{
-            display:flex;
+        #controls div {
+            display: flex;
             align-items: center;
             justify-content: center;
             position: absolute;
             vertical-align: middle;
-            width:33.3%;
-            height:100%;
+            width: 33.3%;
+            height: 100%;
             font-size: 3em;
             text-align: center;
             color: white;
-            border-left: 1px solid  white;
-            border-right: 1px solid  white;
+            border-left: 1px solid white;
+            border-right: 1px solid white;
         }
 
         .left {
             left: 0%;
         }
-        .center{
-            left:33.3%;
+
+        .center {
+            left: 33.3%;
             mask-image: url(fari.png);
             background-color: white;
             mask-size: 20vw;
@@ -76,23 +90,62 @@
             mask-repeat: no-repeat;
         }
 
-        .center.on{
+        .center.on {
             background-color: rgb(238, 200, 30);
         }
-        .right{
-            left:66.6%;
+
+        .right {
+            left: 66.6%;
         }
 
-        @media only screen and (max-device-width:600px)  {
+        @media only screen and (max-device-width:600px) {
             #controls {
                 display: block;
             }
+
+            body{
+                font-size: 1.5em;
+            }
         }
 
+        #welcome {
+            position:fixed;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: calc(100% - 60px);
+            
+            height: calc(100vh - 60px);
+            top:0;
+            left:0;
+            padding:30px;
+            text-align: center;
+            z-index: 999999;
+            overflow: auto;
+            font-size:0.8em;
+        }
+
+        #welcome img{
+            max-width: 80vw;
+            width:700px;
+            display: block;
+            margin: auto;
+        }
     </style>
 </head>
 
 <body>
+    <div id="welcome">
+        FRENCH MATEU's CRONICLES
+        <p>
+            help Franch Mateu escape!<br>
+            The police doesn't know he has limited battery power and he must get home safely to return his rented car,
+            and they want to arrest him because he's saving battery juice turning the lights off!<br><br>...classic french mateu!
+        </p>
+        <img src="welcome.png">
+        TAP TO START
+    </div>
     <div id="distance"></div>
     <div id="battery"></div>
     <div id="busted">BUSTED</div>

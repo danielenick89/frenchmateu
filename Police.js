@@ -91,6 +91,11 @@ class Car extends THREE.Group {
         const sirenR = getCube(0.3,0.1,0.1,0x0000ff,false);
         sirenR.position.set(0.2,0.7,1.5);
 
+        this.turnedOnSirenMaterialL = sirenL.material;
+        this.turnedOnSirenMaterialR = sirenR.material;
+        this.turnedOffSirenMaterialL = new THREE.MeshStandardMaterial({color: 0xff0000});
+        this.turnedOffSirenMaterialR = new THREE.MeshStandardMaterial({color: 0x0000ff});
+
         this.add(sirenL);
         this.add(sirenR);
         this.add(sirenConnector)
@@ -118,9 +123,13 @@ class Car extends THREE.Group {
     }
 
     siren(on) {
+        if(on && this.interval) return;
         clearInterval(this.interval);
+        this.interval = null;
         if(on) {
-            setInterval(()=>{
+            this.sirenR.material = this.turnedOnSirenMaterialR;
+            this.sirenL.material = this.turnedOnSirenMaterialL;
+            this.interval = setInterval(()=>{
                 this.sirenLeftRed = !this.sirenLeftRed;
                 if(this.sirenLeftRed) {
                     this.sirenL.material.color.setHex(0xff00000)
@@ -130,6 +139,9 @@ class Car extends THREE.Group {
                     this.sirenL.material.color.setHex(0x00000ff)
                 }
             },200);
+        } else {
+            this.sirenR.material = this.turnedOffSirenMaterialR;
+            this.sirenL.material = this.turnedOffSirenMaterialL;
         }
     }
 }

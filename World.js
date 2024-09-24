@@ -22,6 +22,7 @@ class World extends THREE.Group {
 
         const TREE_COUNT = 100;
         this.POLICE_RANGE = 1;
+        this.SIREN_POLICE_RANGE = 30;
 
         const random = getRandom(seed);
         const street = new Street(length);
@@ -43,12 +44,11 @@ class World extends THREE.Group {
         for (let i = 0; i < length / 10; i++) {
             if (random() < policeProbability) {
                 const police = new Police();
-                police.siren(true)
                 if (random() < 0.5) {
-                    police.rotation.y = Math.PI / 2;
+                    police.rotation.y = Math.PI / 2 * 0.8;
                     police.position.x = +0.5;
                 } else {
-                    police.rotation.y = -Math.PI / 2;
+                    police.rotation.y = -Math.PI / 2 * 0.8;
                     police.position.x = -0.5;
                 }
                 police.position.z = i * length / 10 - length / 2 + length / 20;
@@ -70,17 +70,19 @@ class World extends THREE.Group {
     }
 
     isPoliceWatching(car) {
-        const vertex = new THREE.Vector3(); // create once and reuse
+        let found = false;
         for(let i=0; i<this.polices.length; i++) {
+            const p = this.polices[i];
+            let dz = car.position.z - p.position.z - this.position.z;
+            
+            this.polices[i].siren((dz < this.SIREN_POLICE_RANGE) && dz >= 0);
 
-            vertex.copy(this.polices[i].position);
-
-            this.polices[i].localToWorld( vertex );
-            const dz = car.position.z - vertex.z;
-            if(dz < this.POLICE_RANGE && dz > 0) return true;
+            if(dz < this.POLICE_RANGE && dz > 0) {
+                found = true;
+            }
         }
 
-        return false;
+        return found;
     }
 }
 

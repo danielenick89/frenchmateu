@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { InfiniteExtendingWorld } from './World.js'
 import { Car } from './Car.js';
-import { updateDistance, updateBattery, showBusted, toggleLightClass } from './UI.js';
+import { updateDistance, updateBattery, showBusted, toggleLightClass, hideWelcomeScreen } from './UI.js';
 
 const scene = new THREE.Scene();
 scene.fog = new THREE.Fog(0, 10, 100);
@@ -18,7 +18,8 @@ let lights = false;
 const world = new InfiniteExtendingWorld(0.1);
 const car = new Car();
 
-let lastTime = 0;
+let lastTime = null;
+let startTime = null;
 let blackoutStart = -500;
 let blackoutTime = null;
 const BLACKOUT_TIME_SHORT = 100;
@@ -33,15 +34,17 @@ let battery = 100;
 let lost = false;
 
 function animate(time) {
+    if(startTime === null) {
+        startTime = time;
+        lastTime = startTime;
+        return;
+    }
+    time -= startTime;
     const dt = time - lastTime;
     lastTime = time;
     controls.update()
     world.move(dt);
     car.lights(lights);
-
-    if (!lights && world.isPoliceWatching(car)) {
-        lost = true;
-    }
 
     if (time - blackoutStart < blackoutTime) {
         world.setLight(false);
@@ -63,6 +66,10 @@ function animate(time) {
             car.drive(currentDir, dt);
         } else {
             car.drive(0, dt)
+        }
+
+        if (world.isPoliceWatching(car) && !lights) {
+            lost = true;
         }
 
 
@@ -100,6 +107,14 @@ function popuplate() {
 }
 
 function init() {
+
+    hideWelcomeScreen();
+
+    document.body.addEventListener('keydown', handleKeydown);
+    document.body.addEventListener('keyup', handleKeyup);
+    document.getElementById('controls').addEventListener('touchstart', handleTouchStart);
+    document.getElementById('controls').addEventListener('touchend', handleTouchEnd);
+
     popuplate();
     camera.position.z = 31;
     camera.position.y = 2;
@@ -162,9 +177,6 @@ const handleTouchEnd = (event) => {
     }
 }
 
-document.body.addEventListener('keydown', handleKeydown);
-document.body.addEventListener('keyup', handleKeyup);
-document.getElementById('controls').addEventListener('touchstart', handleTouchStart);
-document.getElementById('controls').addEventListener('touchend', handleTouchEnd);
 
-init();
+
+document.getElementById('welcome').addEventListener('click', init);

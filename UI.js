@@ -20,3 +20,7 @@ export const showBusted = (text) => {
 export const toggleLightClass = (light) => {
     document.getElementsByClassName('center')[0].classList.toggle('on')
 }
+
+export const hideWelcomeScreen = () => {
+    document.getElementById('welcome').style.display = 'none'
+}
