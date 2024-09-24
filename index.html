@@ -1,0 +1,43 @@
+<html>
+
+<head>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-size: 4.0em;
+        }
+
+        #distance {
+            position: fixed;
+            top: 0;
+            right: 0;
+            padding: 20px;
+            color: white;
+        }
+
+        #battery {
+            position: fixed;
+            top: 0;
+            left: 0;
+            padding: 20px;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="distance"></div>
+    <div id="battery"></div>
+    <script type="importmap">
+            {
+              "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three/build/three.module.js",
+                "three/addons/": "https://cdn.jsdelivr.net/npm/three/examples/jsm/"
+              }
+            }
+          </script>
+    <script type="module" src="./script.js"></script>
+</body>
+
+</html>
