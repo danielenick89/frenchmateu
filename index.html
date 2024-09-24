@@ -132,6 +132,13 @@
             display: block;
             margin: auto;
         }
+
+        #busted #retry{
+            margin-top: 30px;
+            text-decoration: underline;
+            font-size: 0.7em;
+            cursor: pointer;
+        }
     </style>
 </head>
 
@@ -148,7 +155,10 @@
     </div>
     <div id="distance"></div>
     <div id="battery"></div>
-    <div id="busted">BUSTED</div>
+    <div id="busted">
+        <div id="busted-text"></div>
+        <div id="retry" onclick="location.reload()">RETRY</div>
+    </div>
     <div id="controls">
         <div class="left">
             &lt;

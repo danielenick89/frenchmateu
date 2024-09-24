@@ -14,7 +14,7 @@ export const updateBattery = (b) => {
 
 export const showBusted = (text) => {
     document.getElementById('busted').style.display = 'block';
-    document.getElementById('busted').textContent = text;
+    document.getElementById('busted-text').innerHTML = text;
 }
 
 export const toggleLightClass = (light) => {
