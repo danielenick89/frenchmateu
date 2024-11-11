@@ -34,7 +34,7 @@ class LampPost extends THREE.Group {
 }
 
 class Street extends THREE.Group {
-    constructor(length) {
+    constructor(length,world) {
         super()
         this.posts = [];
         const g = new THREE.BoxGeometry(5, 0.2, length);
@@ -58,7 +58,7 @@ class Street extends THREE.Group {
             post.position.set(side*3.5,0,length/2-i*POLE_DISTANCE);
             this.add(post);
             this.posts.push(post);
-            CollisionDetector.add(post,0.5);
+            CollisionDetector.add(post,0.5,world);
         }
 
         const l1 = new THREE.Mesh(new THREE.BoxGeometry(0.1,0.2,length),clm);

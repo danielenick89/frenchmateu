@@ -26,7 +26,7 @@ class World extends THREE.Group {
         this.SIREN_POLICE_RANGE = 30;
 
         const random = getRandom(seed);
-        const street = new Street(length);
+        const street = new Street(length,this);
 
         this.polices = [];
 
@@ -41,7 +41,7 @@ class World extends THREE.Group {
             const b = new Bush(size);
             b.position.set(dir * x, 0, y);
             this.add(b);
-            CollisionDetector.add(b,size/2);
+            CollisionDetector.add(b,size/2,this);
         }
 
         for (let i = 0; i < length / 10; i++) {
@@ -57,7 +57,7 @@ class World extends THREE.Group {
                 police.position.z = i * length / 10 - length / 2 + length / 20;
                 this.polices.push(police);
                 this.add(police);
-                CollisionDetector.add(police,0.9);
+                CollisionDetector.add(police,0.9,this);
             }
         }
 
@@ -102,7 +102,6 @@ class InfiniteExtendingWorld extends THREE.Group {
         this.SUBLENGTH = this.WORLD_LENGTH;
 
         this.world = new World(this.WORLD_LENGTH, policeProbability,seed);
-        CollisionDetector.setWorld(this.world);
         this.nextWorld = new World(this.WORLD_LENGTH, policeProbability,seed);
         this.nextWorld.position.z = -this.WORLD_LENGTH;
 
@@ -114,12 +113,14 @@ class InfiniteExtendingWorld extends THREE.Group {
     }
 
     move(dt) {
-        const ds = dt * this.RATIO
-        this.world.position.z += ds;
-        this.nextWorld.position.z += ds;
+        const dz = dt * this.RATIO;
+
+        CollisionDetector.setWorldDz(dz);
+        this.world.position.z += dz;
+        this.nextWorld.position.z += dz;
         if (this.world.position.z > this.SUBLENGTH) {
-            this.world.position.z = 0;
-            this.nextWorld.position.z = -this.WORLD_LENGTH;
+            this.world.position.z %= this.SUBLENGTH;
+            this.nextWorld.position.z = -this.WORLD_LENGTH+this.world.position.z;
         }
     }
 
